@@ -1,5 +1,6 @@
 
 var ctx, canvas;
+
 // I have no idea why we need this now, I feel like we never needed it before:
 (function(window, document, undefined){
   window.onload = init;
@@ -9,6 +10,8 @@ var ctx, canvas;
       canvas = document.getElementById('canv');
       console.log(canvas);
       ctx = canvas.getContext('2d');
+      ctx.font = 'Garamond';
+      // make_base();
 
       polygon(1, 1, 14, 260);
 
@@ -16,6 +19,14 @@ var ctx, canvas;
 
 })(window, document, undefined);
 
+// Thanks stackoverflow:
+function make_base() {
+  base_image = new Image();
+  base_image.src = 'pics/pics_abdul.png';
+  base_image.onload = function(){
+    ctx.drawImage(base_image, 0, 0, 100, 100);
+  };
+}
 
 var actorsData = 'actors,bill_nighy,keira_knightley,andrew_lincoln,hugh_grant,colin_firth,alan_rickman,heike_makatsch,laura_linney,emma_thompson,liam_neeson,kris_marshall,abdul_salis,martin_freeman,rowan_atkinson';
 
@@ -51,20 +62,40 @@ var connections = [
 // In our case, x is the number of actors, 14:
 function polygon(a, b, x, r) {
   ctx.translate(canvas.width/2, canvas.height/2);
+
   for (var i = 0; i < x; i++) {
     // I suppose we can ignore the values on the diagonal, because those just count how many scenes each actor appears in. Or we could use that to size their circle...
+
     var xCoord = r * a * Math.cos(i * 2 * Math.PI/x);
     var yCoord = r * b * Math.sin(i * 2 * Math.PI/x);
     var row = connections[i];
-    ctx.beginPath();
+    // ctx.beginPath();
     // Move to the ith row in our matrix:
     ctx.moveTo(xCoord, yCoord);
+    ctx.beginPath();
+
     // Draw circle to represent amount of scenes appeared in (soon to be filled with actor's face):
     ctx.arc(xCoord, yCoord, 4 * row[row.length - 1], 0, 2 * Math.PI);
+    // ctx.closePath();
+    // ctx.clip();
+    // base_image = new Image();
+    // base_image.src = 'pics/pics_abdul.png';
+    // base_image.onload = function(){
+    //   ctx.drawImage(base_image, xCoord, yCoord, 100, 100);
+    // };
+
+    ctx.fillStyle = 'black';
+    console.log(xCoord, yCoord);
+    if (xCoord > 0) {
+      ctx.fillText(actors[i], xCoord * 1.2, yCoord * 1.2);
+    } else {
+      ctx.fillText(actors[i], xCoord * 1.2 - 60, yCoord * 1.2);
+    }
     ctx.fillStyle = getRandomColor();
     ctx.fill();
+    // ctx.closePath();
     // ctx.lineTo(r*a*Math.cos((i+1)*2*Math.PI/x), r*b*Math.sin((i+1)*2*Math.PI/x));
-    ctx.stroke();
+    // ctx.stroke();
 
     for (var j=0; j < row.length - 1; j++) {
       // Honestly unsure whether either are needed:
@@ -76,7 +107,10 @@ function polygon(a, b, x, r) {
       ctx.lineTo(targetX, targetY);
       ctx.lineWidth = row[j] * 3;
       ctx.stroke();
+      ctx.closePath();
     }
+
+
 
   }
   ctx.translate(-canvas.width/2, -canvas.height/2);
@@ -93,4 +127,4 @@ function getRandomColor() {
 }
 
 
-// console.log(actors);
+console.log(actors);
